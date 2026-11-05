@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    body { font-family: sans-serif; padding: 16px; line-height: 1.5; }
+    h2 { margin-top: 0; }
+    .ok { color: #0a7a2f; }
+    .err { color: #b00020; }
+    pre { background: #f4f4f4; padding: 8px; white-space: pre-wrap; word-break: break-all; font-size: 12px; }
+    a.btn { display: inline-block; margin-top: 12px; padding: 12px 20px; background: #06c755; color: #fff; text-decoration: none; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h2>LIFF Test (GitHub Pages)</h2>
+  <div id="greeting">กำลังโหลด...</div>
+  <pre id="log"></pre>
+
+  <!-- ปุ่มทดสอบ: พาไปหน้าอื่นด้วย target="_top" (ต้องกดเอง) -->
+  <a class="btn" id="goBtn" href="https://www.google.com" target="_top">ทดสอบปุ่ม (ไป google.com)</a>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script>
+    // TODO: ใส่ LIFF ID จาก LINE Developers Console (รูปแบบ 1234567890-AbCdEfGh)
+    var LIFF_ID = '2012401306-9qDbo6dQ';
+
+    var logEl = document.getElementById('log');
+    function log(msg) { logEl.textContent += msg + '\n'; }
+
+    log('inner href: ' + location.href);
+    log('referrer: ' + document.referrer);
+    log('userAgent: ' + navigator.userAgent);
+
+    if (!LIFF_ID) {
+      document.getElementById('greeting').innerHTML =
+        '<span class="ok">หน้า GAS เปิดได้ (เปิดหน้าได้)</span><br>ยังไม่ได้ใส่ LIFF ID จึงยังไม่ทดสอบข้อ 3';
+    } else {
+      liff.init({ liffId: LIFF_ID })
+        .then(function () {
+          log('liff.init OK');
+          log('isInClient: ' + liff.isInClient());
+          log('isLoggedIn: ' + liff.isLoggedIn());
+          log('os: ' + liff.getOS() + ' / lang: ' + liff.getLanguage());
+          if (!liff.isLoggedIn()) {
+            log('ยังไม่ล็อกอิน LINE (เปิดนอกแอป LINE?) ไม่บังคับล็อกอิน');
+            document.getElementById('greeting').innerHTML =
+              'เปิดนอกแอป LINE จึงไม่มีชื่อ LINE ให้ ไม่ต้องล็อกอิน ไปต่อได้เลย';
+            return null;
+          }
+          return liff.getProfile();
+        })
+        .then(function (p) {
+          if (!p) return;
+          document.getElementById('greeting').innerHTML =
+            '<span class="ok">ผ่านข้อ 3</span><br>สวัสดีคุณ ' + escapeHtml(p.displayName);
+          log('displayName: ' + p.displayName);
+          log('userId: ' + p.userId);
+        })
+        .catch(function (err) {
+          document.getElementById('greeting').innerHTML =
+            '<span class="err">LIFF ผิดพลาด</span>';
+          log('ERROR: ' + (err && err.code ? err.code + ' ' : '') + (err && err.message ? err.message : err));
+        });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+  </script>
+</body>
+</html>
