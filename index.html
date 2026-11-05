@@ -1,73 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-  <base target="_top">
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Store Registration</title>
   <style>
-    body { font-family: sans-serif; padding: 16px; line-height: 1.5; }
-    h2 { margin-top: 0; }
-    .ok { color: #0a7a2f; }
-    .err { color: #b00020; }
-    pre { background: #f4f4f4; padding: 8px; white-space: pre-wrap; word-break: break-all; font-size: 12px; }
-    a.btn { display: inline-block; margin-top: 12px; padding: 12px 20px; background: #06c755; color: #fff; text-decoration: none; border-radius: 8px; }
+    :root {
+      --bg: #ffffff;
+      --text: #1b1b1b;
+      --muted: #666666;
+      --brand: #06c755;
+      --brand-disabled: #9fdfb9;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #17181a;
+        --text: #f1f1f1;
+        --muted: #a9a9a9;
+        --brand-disabled: #2f6b47;
+      }
+    }
+    html, body { margin: 0; background: var(--bg); color: var(--text); }
+    body { font-family: -apple-system, "Segoe UI", "Noto Sans Thai", Roboto, sans-serif; line-height: 1.6; }
+    main { max-width: 480px; margin: 0 auto; padding: 32px 20px; box-sizing: border-box; }
+    h1 { font-size: 1.4rem; margin: 0 0 4px; }
+    .sub { color: var(--muted); margin: 0 0 24px; }
+    #hello { font-size: 1.1rem; margin: 0 0 24px; min-height: 1.6em; }
+    .btn {
+      display: block; text-align: center; padding: 14px 20px; border-radius: 10px;
+      background: var(--brand); color: #fff; text-decoration: none; font-size: 1.05rem; font-weight: 600;
+    }
+    .btn[aria-disabled="true"] { background: var(--brand-disabled); pointer-events: none; }
+    .note { color: var(--muted); font-size: 0.85rem; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h2>LIFF Test (GitHub Pages)</h2>
-  <div id="greeting">กำลังโหลด...</div>
-  <pre id="log"></pre>
+  <main>
+    <h1>ลงทะเบียนร้านค้า</h1>
+    <p class="sub">Store Registration</p>
 
-  <!-- ปุ่มทดสอบ: พาไปหน้าอื่นด้วย target="_top" (ต้องกดเอง) -->
-  <a class="btn" id="goBtn" href="https://www.google.com" target="_top">ทดสอบปุ่ม (ไป google.com)</a>
+    <p id="hello">กำลังโหลด... / Loading...</p>
+
+    <a id="go" class="btn" href="#" aria-disabled="true">เริ่มลงทะเบียน / Start registration</a>
+
+    <p class="note">
+      เราเก็บชื่อและรหัสบัญชี LINE ของคุณเพื่อใช้ติดต่อและอัปเดตข้อมูลร้านค้าเท่านั้น<br>
+      We collect your LINE name and ID only to contact you and update your store information.
+    </p>
+  </main>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
-    // TODO: ใส่ LIFF ID จาก LINE Developers Console (รูปแบบ 1234567890-AbCdEfGh)
     var LIFF_ID = '2012401306-9qDbo6dQ';
+    var FORM_BASE = 'https://docs.google.com/forms/d/e/1FAIpQLSc20IdkR4gEM2np_vLYv2qmkr3MjBz3n4nRxCZq7H3h2SMMeA/viewform';
+    var ENTRY_USERID = 'entry.1713870780';  // LINE userId
+    var ENTRY_NAME = 'entry.1630540623';    // LINE Display Name
 
-    var logEl = document.getElementById('log');
-    function log(msg) { logEl.textContent += msg + '\n'; }
+    var done = false;
+    var helloEl = document.getElementById('hello');
+    var goEl = document.getElementById('go');
 
-    log('inner href: ' + location.href);
-    log('referrer: ' + document.referrer);
-    log('userAgent: ' + navigator.userAgent);
-
-    if (!LIFF_ID) {
-      document.getElementById('greeting').innerHTML =
-        '<span class="ok">หน้า GAS เปิดได้ (เปิดหน้าได้)</span><br>ยังไม่ได้ใส่ LIFF ID จึงยังไม่ทดสอบข้อ 3';
-    } else {
-      liff.init({ liffId: LIFF_ID })
-        .then(function () {
-          log('liff.init OK');
-          log('isInClient: ' + liff.isInClient());
-          log('isLoggedIn: ' + liff.isLoggedIn());
-          log('os: ' + liff.getOS() + ' / lang: ' + liff.getLanguage());
-          if (!liff.isLoggedIn()) {
-            log('ยังไม่ล็อกอิน LINE (เปิดนอกแอป LINE?) ไม่บังคับล็อกอิน');
-            document.getElementById('greeting').innerHTML =
-              'เปิดนอกแอป LINE จึงไม่มีชื่อ LINE ให้ ไม่ต้องล็อกอิน ไปต่อได้เลย';
-            return null;
-          }
-          return liff.getProfile();
-        })
-        .then(function (p) {
-          if (!p) return;
-          document.getElementById('greeting').innerHTML =
-            '<span class="ok">ผ่านข้อ 3</span><br>สวัสดีคุณ ' + escapeHtml(p.displayName);
-          log('displayName: ' + p.displayName);
-          log('userId: ' + p.userId);
-        })
-        .catch(function (err) {
-          document.getElementById('greeting').innerHTML =
-            '<span class="err">LIFF ผิดพลาด</span>';
-          log('ERROR: ' + (err && err.code ? err.code + ' ' : '') + (err && err.message ? err.message : err));
-        });
+    function buildUrl(p) {
+      var u = FORM_BASE + '?usp=pp_url';
+      if (p && p.userId && p.displayName) {
+        u += '&' + ENTRY_USERID + '=' + encodeURIComponent(p.userId);
+        u += '&' + ENTRY_NAME + '=' + encodeURIComponent(p.displayName);
+      }
+      return u;
     }
 
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, function (c) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-      });
+    function ready(p) {
+      if (done) return;
+      done = true;
+      if (p && p.displayName) {
+        helloEl.textContent = 'สวัสดีคุณ ' + p.displayName + ' / Hello ' + p.displayName;
+      } else {
+        helloEl.textContent = 'สวัสดี / Hello';
+      }
+      goEl.href = buildUrl(p);
+      goEl.setAttribute('aria-disabled', 'false');
+    }
+
+    // ถ้า LIFF ช้าหรือผิดพลาด ให้ใช้งานต่อได้โดยไม่เติมชื่อ (ไม่บังคับล็อกอิน)
+    setTimeout(function () { ready(null); }, 6000);
+
+    try {
+      liff.init({ liffId: LIFF_ID })
+        .then(function () {
+          if (liff.isLoggedIn()) { return liff.getProfile(); }
+          return null;
+        })
+        .then(function (p) { ready(p); })
+        .catch(function () { ready(null); });
+    } catch (e) {
+      ready(null);
     }
   </script>
 </body>
