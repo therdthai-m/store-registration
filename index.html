@@ -2,51 +2,155 @@
 <html lang="th">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Store Registration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CHARGESPOT Partners</title>
   <style>
     :root {
+      /* สีหลักของ CHARGESPOT (เก็บจากแบนเนอร์ในฟอร์ม: #00CDD9) แก้ที่นี่ที่เดียว */
+      --brand: #00cdd9;
+      --brand-dark: #007f89;
+      --brand-button: #009faa;
+      --blob: #d9f8fa;
       --bg: #ffffff;
-      --text: #1b1b1b;
-      --muted: #666666;
-      --brand: #06c755;
-      --brand-disabled: #9fdfb9;
+      --text: #12282b;
+      --muted: #5b6f72;
+      --step-bg: #e3f9fb;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #17181a;
-        --text: #f1f1f1;
-        --muted: #a9a9a9;
-        --brand-disabled: #2f6b47;
+        --brand-dark: #4fe3ec;
+        --blob: #123a3e;
+        --bg: #0e1819;
+        --text: #eaf5f6;
+        --muted: #9db3b6;
+        --step-bg: #123a3e;
       }
     }
+    * { box-sizing: border-box; }
     html, body { margin: 0; background: var(--bg); color: var(--text); }
-    body { font-family: -apple-system, "Segoe UI", "Noto Sans Thai", Roboto, sans-serif; line-height: 1.6; }
-    main { max-width: 480px; margin: 0 auto; padding: 32px 20px; box-sizing: border-box; }
-    h1 { font-size: 1.4rem; margin: 0 0 4px; }
-    .sub { color: var(--muted); margin: 0 0 24px; }
-    #hello { font-size: 1.1rem; margin: 0 0 24px; min-height: 1.6em; }
-    .btn {
-      display: block; text-align: center; padding: 14px 20px; border-radius: 10px;
-      background: var(--brand); color: #fff; text-decoration: none; font-size: 1.05rem; font-weight: 600;
+    body {
+      font-family: -apple-system, "Segoe UI", "Noto Sans Thai", "Sarabun", Roboto, sans-serif;
+      line-height: 1.5;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
-    .btn[aria-disabled="true"] { background: var(--brand-disabled); pointer-events: none; }
-    .note { color: var(--muted); font-size: 0.85rem; margin-top: 20px; }
+    main { max-width: 480px; margin: 0 auto; padding: 20px 22px 32px; position: relative; overflow: hidden; }
+
+    /* ส่วนหัว: โลโก้ + สลับภาษา */
+    header { display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 8px; min-height: 40px; }
+    .logo img { height: 40px; width: auto; display: block; }
+    .wordmark { display: flex; flex-direction: column; line-height: 1.05; }
+    .wordmark b { font-size: 1.05rem; letter-spacing: .5px; color: var(--brand-dark); }
+    .wordmark small { font-size: .8rem; font-weight: 700; }
+    .lang { display: flex; gap: 2px; font-size: .95rem; }
+    .lang button {
+      background: none; border: 0; padding: 6px 8px; font: inherit; color: var(--muted); cursor: pointer; border-radius: 8px;
+    }
+    .lang button[aria-pressed="true"] { color: var(--text); font-weight: 700; }
+    .lang span { align-self: center; color: var(--muted); }
+
+    /* ภาพประกอบ */
+    .hero { display: flex; justify-content: flex-end; margin: 4px -6px -24px 0; }
+    .hero svg, .hero img { width: 62%; max-width: 250px; height: auto; display: block; }
+
+    h1 { font-size: 2.1rem; line-height: 1.2; margin: 0 0 8px; position: relative; }
+    .sub { font-size: 1.1rem; color: var(--muted); margin: 0 0 22px; }
+    .hello { font-size: 1.45rem; font-weight: 700; margin: 0; word-break: break-word; }
+    .time { color: var(--muted); margin: 2px 0 22px; }
+
+    /* ขั้นตอน 3 ข้อ */
+    .steps { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; margin-bottom: 26px; }
+    .step { flex: 1; text-align: center; font-size: .9rem; text-wrap: balance; }
+    .step .ic {
+      width: 64px; height: 64px; margin: 0 auto 8px; border-radius: 50%;
+      background: var(--step-bg); display: grid; place-items: center;
+    }
+    .step .ic svg { width: 34px; height: 34px; }
+    .arrow { margin-top: 20px; color: var(--muted); flex: 0 0 auto; }
+
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 16px 20px; border-radius: 999px; background: var(--brand-button); color: #fff;
+      text-decoration: none; font-size: 1.15rem; font-weight: 700;
+      box-shadow: 0 6px 16px rgba(0, 159, 170, .28);
+    }
+    .btn[aria-disabled="true"] { opacity: .55; pointer-events: none; box-shadow: none; }
+
+    .note { display: flex; gap: 12px; margin-top: 24px; color: var(--muted); font-size: .88rem; }
+    .note svg { flex: 0 0 26px; width: 26px; height: 26px; margin-top: 2px; }
+    .note b { color: var(--text); }
   </style>
 </head>
 <body>
   <main>
-    <h1>ลงทะเบียนร้านค้า</h1>
-    <p class="sub">Store Registration</p>
+    <header>
+      <div class="logo" id="logo">
+        <!-- ใช้ logo.png ถ้าอัปโหลดไว้ ไม่เช่นนั้นแสดงโลโก้สำรองนี้ -->
+        <svg width="38" height="38" viewBox="0 0 36 36" aria-hidden="true">
+          <circle cx="18" cy="18" r="18" fill="var(--brand)"/>
+          <path d="M20.5 6 L10.5 20 H17 L15 30 L25.5 15 H19 Z" fill="#fff"/>
+        </svg>
+        <div class="wordmark"><b>CHARGESPOT</b><small>Partners</small></div>
+      </div>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" id="btnTh" aria-pressed="true">TH</button>
+        <span>|</span>
+        <button type="button" id="btnEn" aria-pressed="false">EN</button>
+      </div>
+    </header>
 
-    <p id="hello">กำลังโหลด... / Loading...</p>
+    <div class="hero" id="hero">
+      <!-- ใช้ hero.png ถ้าอัปโหลดไว้ ไม่เช่นนั้นแสดงภาพประกอบสำรองนี้ -->
+      <svg viewBox="0 0 220 190" aria-hidden="true">
+        <circle cx="122" cy="100" r="80" fill="var(--blob)"/>
+        <g transform="rotate(-16 105 95)">
+          <rect x="72" y="28" width="68" height="124" rx="14" fill="var(--brand)"/>
+          <rect x="80" y="36" width="52" height="108" rx="9" fill="#007f89" opacity=".16"/>
+          <path d="M110 52 L92 100 H106 L100 138 L124 86 H110 Z" fill="#fff"/>
+        </g>
+        <circle cx="166" cy="148" r="23" fill="var(--bg)" stroke="var(--brand)" stroke-width="4"/>
+        <path d="M155.500 148 l7 7 l14 -15.500" fill="none" stroke="var(--brand-dark)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M168 38 l10 -8 M178 54 l14 -2" stroke="var(--brand)" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
 
-    <a id="go" class="btn" href="#" aria-disabled="true">เริ่มลงทะเบียน / Start registration</a>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+    <p class="hello" id="hello"></p>
+    <p class="time" id="time"></p>
 
-    <p class="note">
-      เราเก็บชื่อและรหัสบัญชี LINE ของคุณเพื่อใช้ติดต่อและอัปเดตข้อมูลร้านค้าเท่านั้น<br>
-      We collect your LINE name and ID only to contact you and update your store information.
-    </p>
+    <div class="steps" aria-hidden="false">
+      <div class="step">
+        <div class="ic">
+          <svg viewBox="0 0 32 32" fill="none" stroke="var(--brand-dark)" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="4" width="18" height="24" rx="3"/><path d="M12 11h8M12 16h8M12 21h5"/></svg>
+        </div>
+        <span id="s1"></span>
+      </div>
+      <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      <div class="step">
+        <div class="ic">
+          <svg viewBox="0 0 32 32" fill="none" stroke="var(--brand-dark)" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="20" height="26" rx="3"/><path d="M11 9h10M11 14h4M17 14h4M11 19h4M17 19h4M11 24h4M17 24h4"/></svg>
+        </div>
+        <span id="s2"></span>
+      </div>
+      <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      <div class="step">
+        <div class="ic">
+          <svg viewBox="0 0 32 32" fill="none" stroke="var(--brand-dark)" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="12"/><path d="M10.500 16.500l4 4 7-8"/></svg>
+        </div>
+        <span id="s3"></span>
+      </div>
+    </div>
+
+    <a id="go" class="btn" href="#" aria-disabled="true"><span id="goText"></span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+
+    <div class="note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r="1.200"/></svg>
+      <p id="note" style="margin:0"></p>
+    </div>
   </main>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -56,30 +160,109 @@
     var ENTRY_USERID = 'entry.1713870780';  // LINE userId
     var ENTRY_NAME = 'entry.1630540623';    // LINE Display Name
 
-    var done = false;
-    var helloEl = document.getElementById('hello');
-    var goEl = document.getElementById('go');
+    var TEXT = {
+      th: {
+        title: 'ลงทะเบียนร้านค้า',
+        sub: 'ผูกบัญชีสาขากับ LINE เพื่อให้ทีมงานติดต่อประสานงานได้เร็วขึ้น',
+        hello: function (n) { return n ? 'สวัสดีคุณ ' + n + ' 👋' : 'สวัสดี 👋'; },
+        time: 'ใช้เวลาประมาณ 1 นาที',
+        s1: '1. กรอกข้อมูลร้าน',
+        s2: '2. ระบุเลขเครื่อง',
+        s3: '3. สำเร็จ',
+        go: 'เริ่มลงทะเบียน',
+        note: 'ข้อมูลชื่อและรหัสบัญชี LINE ของคุณจะถูกใช้เพื่อ<b>การติดต่อประสานงานและอัปเดตข้อมูลสาขาเท่านั้น</b>'
+      },
+      en: {
+        title: 'Store Registration',
+        sub: 'Link your branch to LINE so our team can coordinate with you faster.',
+        hello: function (n) { return n ? 'Hello ' + n + ' 👋' : 'Hello 👋'; },
+        time: 'Takes about 1 minute',
+        s1: '1. Enter store info',
+        s2: '2. Enter machine number',
+        s3: '3. Done',
+        go: 'Start registration',
+        note: 'We only collect your LINE name and ID <b>to contact you and update your store information.</b>'
+      }
+    };
 
-    function buildUrl(p) {
-      var u = FORM_BASE + '?usp=pp_url';
-      if (p && p.userId && p.displayName) {
-        u += '&' + ENTRY_USERID + '=' + encodeURIComponent(p.userId);
-        u += '&' + ENTRY_NAME + '=' + encodeURIComponent(p.displayName);
+    var state = { lang: 'th', manual: false, name: '', userId: '', ready: false, liffOk: false };
+    var done = false;
+
+    function $(id) { return document.getElementById(id); }
+
+    function detectLang() {
+      try {
+        var saved = localStorage.getItem('lang');
+        if (saved === 'th' || saved === 'en') { state.manual = true; return saved; }
+      } catch (e) {}
+      var l = '';
+      try { if (state.liffOk) { l = liff.getLanguage() || ''; } } catch (e) {}
+      if (!l) { l = navigator.language || (navigator.languages && navigator.languages[0]) || ''; }
+      return String(l).toLowerCase().indexOf('th') === 0 ? 'th' : 'en';
+    }
+
+    function buildUrl() {
+      var u = FORM_BASE + '?usp=pp_url&hl=' + state.lang;
+      if (state.userId && state.name) {
+        u += '&' + ENTRY_USERID + '=' + encodeURIComponent(state.userId);
+        u += '&' + ENTRY_NAME + '=' + encodeURIComponent(state.name);
       }
       return u;
     }
 
+    function render() {
+      var t = TEXT[state.lang];
+      document.documentElement.lang = state.lang;
+      $('title').textContent = t.title;
+      $('sub').textContent = t.sub;
+      $('hello').textContent = state.ready ? t.hello(state.name) : '…';
+      $('time').textContent = t.time;
+      $('s1').textContent = t.s1;
+      $('s2').textContent = t.s2;
+      $('s3').textContent = t.s3;
+      $('goText').textContent = t.go;
+      $('note').innerHTML = t.note;
+      $('btnTh').setAttribute('aria-pressed', state.lang === 'th');
+      $('btnEn').setAttribute('aria-pressed', state.lang === 'en');
+      $('go').href = buildUrl();
+      $('go').setAttribute('aria-disabled', state.ready ? 'false' : 'true');
+    }
+
+    function setLang(l) {
+      state.lang = l;
+      state.manual = true;
+      try { localStorage.setItem('lang', l); } catch (e) {}
+      render();
+    }
+    $('btnTh').addEventListener('click', function () { setLang('th'); });
+    $('btnEn').addEventListener('click', function () { setLang('en'); });
+
+    // ใช้ไฟล์โลโก้และภาพประกอบจริงถ้าอัปโหลดไว้ใน repository (logo.png / hero.png)
+    function useImage(file, boxId, alt, keepHeader) {
+      var img = new Image();
+      img.onload = function () {
+        var box = $(boxId);
+        box.innerHTML = '';
+        img.alt = alt;
+        box.appendChild(img);
+      };
+      img.src = file;
+    }
+    useImage('logo.png', 'logo', 'CHARGESPOT Partners');
+    useImage('hero.png', 'hero', '');
+
     function ready(p) {
       if (done) return;
       done = true;
-      if (p && p.displayName) {
-        helloEl.textContent = 'สวัสดีคุณ ' + p.displayName + ' / Hello ' + p.displayName;
-      } else {
-        helloEl.textContent = 'สวัสดี / Hello';
-      }
-      goEl.href = buildUrl(p);
-      goEl.setAttribute('aria-disabled', 'false');
+      state.ready = true;
+      if (p && p.displayName && p.userId) { state.name = p.displayName; state.userId = p.userId; }
+      if (!state.manual) { state.lang = detectLang(); }
+      render();
     }
+
+    // เริ่มต้นด้วยภาษาของเบราว์เซอร์ก่อน แล้วค่อยปรับตามภาษาใน LINE เมื่อ LIFF พร้อม
+    state.lang = detectLang();
+    render();
 
     // ถ้า LIFF ช้าหรือผิดพลาด ให้ใช้งานต่อได้โดยไม่เติมชื่อ (ไม่บังคับล็อกอิน)
     setTimeout(function () { ready(null); }, 6000);
@@ -87,6 +270,7 @@
     try {
       liff.init({ liffId: LIFF_ID })
         .then(function () {
+          state.liffOk = true;
           if (liff.isLoggedIn()) { return liff.getProfile(); }
           return null;
         })
