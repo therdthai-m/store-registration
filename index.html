@@ -80,6 +80,14 @@
     .note { display: flex; gap: 12px; margin-top: 24px; color: var(--muted); font-size: .88rem; }
     .note svg { flex: 0 0 26px; width: 26px; height: 26px; margin-top: 2px; }
     .note b { color: var(--text); }
+
+    .err { margin: 0 0 18px; padding: 12px 14px; border-radius: 12px; background: #fff3e0; color: #7a4a00; font-size: .95rem; }
+    .err[hidden] { display: none; }
+    .err button {
+      display: block; margin-top: 10px; padding: 8px 16px; border: 0; border-radius: 999px;
+      background: var(--brand-button); color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+    }
+    @media (prefers-color-scheme: dark) { .err { background: #3a2c12; color: #ffd9a0; } }
   </style>
 </head>
 <body>
@@ -119,6 +127,7 @@
     <p class="sub" id="sub"></p>
     <p class="hello" id="hello"></p>
     <p class="time" id="time"></p>
+    <div class="err" id="err" hidden><span id="errText"></span><button type="button" id="retry"></button></div>
 
     <div class="steps" aria-hidden="false">
       <div class="step">
@@ -156,39 +165,74 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     var LIFF_ID = '2012401306-9qDbo6dQ';
-    var FORM_BASE = 'https://docs.google.com/forms/d/e/1FAIpQLSc20IdkR4gEM2np_vLYv2qmkr3MjBz3n4nRxCZq7H3h2SMMeA/viewform';
     var ENTRY_USERID = 'entry.1713870780';  // LINE userId
     var ENTRY_NAME = 'entry.1630540623';    // LINE Display Name
 
+    var FORMS = {
+      register: { base: 'https://docs.google.com/forms/d/e/1FAIpQLSc20IdkR4gEM2np_vLYv2qmkr3MjBz3n4nRxCZq7H3h2SMMeA/viewform' },
+      update:   { base: 'https://docs.google.com/forms/d/e/1FAIpQLSejJoszo1hj4hrb1aYKNr4v01f-KX14Z9JIgZ1PcHnP6QkLqw/viewform' }
+    };
+
     var TEXT = {
       th: {
-        title: 'ลงทะเบียนร้านค้า',
-        sub: 'ผูกบัญชีสาขากับ LINE เพื่อให้ทีมงานติดต่อประสานงานได้เร็วขึ้น',
-        hello: function (n) { return n ? 'สวัสดีคุณ ' + n + ' 👋' : 'สวัสดี 👋'; },
+        register: {
+          title: 'ลงทะเบียนร้านค้า',
+          sub: 'ผูกบัญชีสาขากับ LINE เพื่อให้ทีมงานติดต่อประสานงานได้เร็วขึ้น',
+          s1: '1. กรอกข้อมูลร้าน', s2: '2. ระบุเลขเครื่อง', s3: '3. สำเร็จ',
+          go: 'เริ่มลงทะเบียน'
+        },
+        update: {
+          title: 'อัปเดตข้อมูลร้านค้า',
+          sub: 'แจ้งอัปเดตข้อมูลสาขาถึงทีมงานผ่านบัญชี LINE ของคุณ',
+          s1: '1. ระบุเลขเครื่อง', s2: '2. เลือกรายการอัปเดต', s3: '3. สำเร็จ',
+          go: 'เริ่มอัปเดตข้อมูล'
+        },
+        hello: function (n) { return 'สวัสดีคุณ ' + n + ' 👋'; },
         time: 'ใช้เวลาประมาณ 1 นาที',
-        s1: '1. กรอกข้อมูลร้าน',
-        s2: '2. ระบุเลขเครื่อง',
-        s3: '3. สำเร็จ',
-        go: 'เริ่มลงทะเบียน',
-        note: 'ข้อมูลชื่อและรหัสบัญชี LINE ของคุณจะถูกใช้เพื่อ<b>การติดต่อประสานงานและอัปเดตข้อมูลสาขาเท่านั้น</b>'
+        note: 'ข้อมูลชื่อและรหัสบัญชี LINE ของคุณจะถูกใช้เพื่อ<b>การติดต่อประสานงานและอัปเดตข้อมูลสาขาเท่านั้น</b>',
+        err: 'ไม่สามารถอ่านชื่อ LINE ของคุณได้ กรุณาเปิดหน้านี้จากเมนูในแอป LINE และกดอนุญาตการเข้าถึงโปรไฟล์',
+        slow: 'กำลังโหลดช้ากว่าปกติ หากรอแล้วไม่ขึ้น ให้กดลองใหม่',
+        retry: 'ลองใหม่'
       },
       en: {
-        title: 'Store Registration',
-        sub: 'Link your branch to LINE so our team can coordinate with you faster.',
-        hello: function (n) { return n ? 'Hello ' + n + ' 👋' : 'Hello 👋'; },
+        register: {
+          title: 'Store Registration',
+          sub: 'Link your branch to LINE so our team can coordinate with you faster.',
+          s1: '1. Enter store info', s2: '2. Enter machine number', s3: '3. Done',
+          go: 'Start registration'
+        },
+        update: {
+          title: 'Store Update',
+          sub: 'Send branch updates to our team through your LINE account.',
+          s1: '1. Enter machine number', s2: '2. Select what to update', s3: '3. Done',
+          go: 'Start update'
+        },
+        hello: function (n) { return 'Hello ' + n + ' 👋'; },
         time: 'Takes about 1 minute',
-        s1: '1. Enter store info',
-        s2: '2. Enter machine number',
-        s3: '3. Done',
-        go: 'Start registration',
-        note: 'We only collect your LINE name and ID <b>to contact you and update your store information.</b>'
+        note: 'We only collect your LINE name and ID <b>to contact you and update your store information.</b>',
+        err: 'We could not read your LINE name. Please open this page from the menu in the LINE app and allow profile access.',
+        slow: 'Taking longer than usual. If nothing appears, tap Try again.',
+        retry: 'Try again'
       }
     };
 
-    var state = { lang: 'th', manual: false, name: '', userId: '', ready: false, liffOk: false };
-    var done = false;
+    var state = { lang: 'th', manual: false, form: 'register', name: '', userId: '', status: 'loading', liffOk: false };
 
     function $(id) { return document.getElementById(id); }
+
+    // เลือกฟอร์มจากพารามิเตอร์ ?form=update (รองรับทั้งแบบตรงและแบบที่ LIFF ห่อไว้ใน liff.state)
+    function detectForm() {
+      var f = null;
+      try {
+        var s = new URLSearchParams(location.search);
+        f = s.get('form');
+        if (!f && s.get('liff.state')) {
+          var st = s.get('liff.state');
+          f = new URLSearchParams(st.charAt(0) === '?' ? st.slice(1) : st).get('form');
+        }
+      } catch (e) {}
+      return f === 'update' ? 'update' : 'register';
+    }
 
     function detectLang() {
       try {
@@ -202,30 +246,38 @@
     }
 
     function buildUrl() {
-      var u = FORM_BASE + '?usp=pp_url&hl=' + state.lang;
-      if (state.userId && state.name) {
-        u += '&' + ENTRY_USERID + '=' + encodeURIComponent(state.userId);
-        u += '&' + ENTRY_NAME + '=' + encodeURIComponent(state.name);
-      }
+      var u = FORMS[state.form].base + '?usp=pp_url&hl=' + state.lang;
+      u += '&' + ENTRY_USERID + '=' + encodeURIComponent(state.userId);
+      u += '&' + ENTRY_NAME + '=' + encodeURIComponent(state.name);
       return u;
     }
 
     function render() {
       var t = TEXT[state.lang];
+      var f = t[state.form];
+      var ok = state.status === 'ok';
       document.documentElement.lang = state.lang;
-      $('title').textContent = t.title;
-      $('sub').textContent = t.sub;
-      $('hello').textContent = state.ready ? t.hello(state.name) : '…';
+      document.title = f.title + ' | CHARGESPOT Partners';
+      $('title').textContent = f.title;
+      $('sub').textContent = f.sub;
+      $('hello').textContent = ok ? t.hello(state.name) : (state.status === 'loading' ? '…' : '');
       $('time').textContent = t.time;
-      $('s1').textContent = t.s1;
-      $('s2').textContent = t.s2;
-      $('s3').textContent = t.s3;
-      $('goText').textContent = t.go;
+      $('s1').textContent = f.s1;
+      $('s2').textContent = f.s2;
+      $('s3').textContent = f.s3;
+      $('goText').textContent = f.go;
       $('note').innerHTML = t.note;
       $('btnTh').setAttribute('aria-pressed', state.lang === 'th');
       $('btnEn').setAttribute('aria-pressed', state.lang === 'en');
-      $('go').href = buildUrl();
-      $('go').setAttribute('aria-disabled', state.ready ? 'false' : 'true');
+
+      var showErr = state.status === 'slow' || state.status === 'error';
+      $('err').hidden = !showErr;
+      $('errText').textContent = state.status === 'slow' ? t.slow : t.err;
+      $('retry').textContent = t.retry;
+
+      // เปิดฟอร์มได้เฉพาะเมื่อได้ชื่อและ userId จาก LINE แล้วเท่านั้น
+      $('go').href = ok ? buildUrl() : '#';
+      $('go').setAttribute('aria-disabled', ok ? 'false' : 'true');
     }
 
     function setLang(l) {
@@ -236,9 +288,10 @@
     }
     $('btnTh').addEventListener('click', function () { setLang('th'); });
     $('btnEn').addEventListener('click', function () { setLang('en'); });
+    $('retry').addEventListener('click', function () { location.reload(); });
 
     // ใช้ไฟล์โลโก้และภาพประกอบจริงถ้าอัปโหลดไว้ใน repository (logo.png / hero.png)
-    function useImage(file, boxId, alt, keepHeader) {
+    function useImage(file, boxId, alt) {
       var img = new Image();
       img.onload = function () {
         var box = $(boxId);
@@ -251,33 +304,44 @@
     useImage('logo.png', 'logo', 'CHARGESPOT Partners');
     useImage('hero.png', 'hero', '');
 
-    function ready(p) {
-      if (done) return;
-      done = true;
-      state.ready = true;
-      if (p && p.displayName && p.userId) { state.name = p.displayName; state.userId = p.userId; }
-      if (!state.manual) { state.lang = detectLang(); }
+    function onProfile(p) {
+      if (p && p.userId && p.displayName) {
+        state.name = p.displayName;
+        state.userId = p.userId;
+        state.status = 'ok';
+        if (!state.manual) { state.lang = detectLang(); }
+      } else {
+        fail('error');
+        return;
+      }
       render();
     }
 
-    // เริ่มต้นด้วยภาษาของเบราว์เซอร์ก่อน แล้วค่อยปรับตามภาษาใน LINE เมื่อ LIFF พร้อม
+    function fail(kind) {
+      if (state.status === 'ok') return;  // ได้ข้อมูลแล้ว ไม่ต้องแสดงข้อผิดพลาด
+      state.status = kind;
+      render();
+    }
+
+    state.form = detectForm();
     state.lang = detectLang();
     render();
 
-    // ถ้า LIFF ช้าหรือผิดพลาด ให้ใช้งานต่อได้โดยไม่เติมชื่อ (ไม่บังคับล็อกอิน)
-    setTimeout(function () { ready(null); }, 6000);
+    // ถ้าโหลดช้า แสดงข้อความและปุ่มลองใหม่ แต่ยังรอต่อ ถ้าได้ข้อมูลภายหลังจะใช้งานได้ทันที
+    setTimeout(function () { if (state.status === 'loading') fail('slow'); }, 8000);
 
     try {
       liff.init({ liffId: LIFF_ID })
         .then(function () {
           state.liffOk = true;
+          state.form = detectForm();
           if (liff.isLoggedIn()) { return liff.getProfile(); }
           return null;
         })
-        .then(function (p) { ready(p); })
-        .catch(function () { ready(null); });
+        .then(function (p) { onProfile(p); })
+        .catch(function () { fail('error'); });
     } catch (e) {
-      ready(null);
+      fail('error');
     }
   </script>
 </body>
